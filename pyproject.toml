@@ -1,0 +1,36 @@
+[project]
+name = "app"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "django>=6.0.6",
+]
+
+[dependency-groups]
+dev = [
+    "black>=26.5.1",
+    "pylint>=4.0.6",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+
+[tool.pylint.messages_control]
+# 既存のコードスタイルと重複・競合しやすい警告を一部無効化（必要に応じて調整してください）
+disable = [
+    "C0114", # Missing module docstring
+    "C0115", # Missing class docstring
+    "C0116", # Missing function or method docstring
+]
+
+[tool.pylint.format]
+max-line-length = 88
+
+[tool.pytest.ini_options]
+addopts = "--cov=. --cov-report=term-missing --cov-report=xml"
+testpaths = ["tests"]
