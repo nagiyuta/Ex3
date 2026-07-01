@@ -7,8 +7,7 @@ __pycache__/
 *.pyo
 *.pyd
 .pytest_cache/
-.black_cache/
-.pylint cache/
+.pylint-stats
 
 # Coverage reports
 .coverage
