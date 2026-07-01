@@ -9,4 +9,4 @@
  black(format tool)  
  pylint(linting tool)  
  pytest(test tool)  
- pytest-cov(vovarage tool)  
+ pytest-cov(covarage tool)  
