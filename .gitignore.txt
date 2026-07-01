@@ -1,0 +1,15 @@
+# uv / Python virtual environment
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.black_cache/
+.pylint cache/
+
+# Coverage reports
+.coverage
+htmlcov/
