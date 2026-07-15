@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<article class="movie-detail">
+    <h2>{{ movie.title }}</h2>
+
+    {% if movie.poster_image %}
+        <img
+            src="{{ movie.poster_image }}"
+            alt="{{ movie.title }} poster"
+            class="movie-poster"
+        >
+    {% else %}
+        <p>No poster image is available.</p>
+    {% endif %}
+
+    <section aria-labelledby="rating-heading">
+        <h3 id="rating-heading">Rating</h3>
+
+        {% if movie.average_rating %}
+            <p>
+                Average rating:
+                {{ movie.average_rating|floatformat:1 }}/10
+            </p>
+        {% else %}
+            <p>No ratings yet.</p>
+        {% endif %}
+    </section>
+
+    <section aria-labelledby="reviews-heading">
+        <h3 id="reviews-heading">Reviews</h3>
+
+        {% if reviews %}
+            <ul class="review-list">
+                {% for review in reviews %}
+                    <li>
+                        <p>
+                            <strong>{{ review.user.username }}</strong>
+                            — {{ review.star_rating }}/10
+                        </p>
+
+                        <p>{{ review.review_text }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No reviews have been posted yet.</p>
+        {% endif %}
+    </section>
+
+    <p>
+        <a href="{% url 'review' movie.id %}">
+            Write a review
+        </a>
+    </p>
+
+    <p>
+        <a href="{% url 'movie_list' %}">
+            Back to movie list
+        </a>
+    </p>
+</article>
+
+{% endblock %}

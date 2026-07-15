@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404,render
 from django.http import HttpResponse
-from .models import User
+from django.db.models import Avg
+from .models import User,Movie,Review
 
 def home(request):
     return render(request, "home.html")
@@ -52,36 +53,134 @@ def login(request):
     return render(request, "login.html")
 
 
+
 def movie_list(request):
-    keyword = request.GET.get("search", "")
-    rating = request.GET.get("rating", "")
+    search = request.GET.get("search", "").strip()
+    rating = request.GET.get("rating", "").strip()
 
-    return render(request, "movie_list.html")
+    movies = Movie.objects.annotate(
+        average_rating=Avg("reviews__star_rating")
+    ).order_by("title")
 
+    if search:
+        movies = movies.filter(title__icontains=search)
+
+    if rating:
+        try:
+            minimum_rating = int(rating)
+
+            if 0 <= minimum_rating <= 10:
+                movies = movies.filter(
+                    average_rating__gte=minimum_rating
+                )
+        except ValueError:
+            pass
+
+    context = {
+        "movies": movies,
+        "search": search,
+        "rating": rating,
+    }
+
+    return render(request, "movie_list.html", context)
+
+
+def movie_search(request):
+    search = request.GET.get("search", "").strip()
+    rating = request.GET.get("rating", "").strip()
+
+    movies = Movie.objects.annotate(
+        average_rating=Avg("reviews__star_rating")
+    ).order_by("title")
+
+    if search:
+        movies = movies.filter(title__icontains=search)
+
+    if rating:
+        try:
+            minimum_rating = int(rating)
+
+            if 0 <= minimum_rating <= 10:
+                movies = movies.filter(
+                    average_rating__gte=minimum_rating
+                )
+        except ValueError:
+            pass
+
+    return render(
+        request,
+        "partials/movie_results.html",
+        {"movies": movies},
+    )
+
+def movie_detail(request, movie_id):
+    movie = get_object_or_404(
+        Movie.objects.annotate(
+            average_rating=Avg("reviews__star_rating")
+        ),
+        id=movie_id,
+    )
+
+    reviews = movie.reviews.select_related("user").all()
+
+    context = {
+        "movie": movie,
+        "reviews": reviews,
+    }
+
+    return render(request, "movie_detail.html", context)
 
 def review(request, movie_id):
+    movie = get_object_or_404(Movie, id=movie_id)
+
     if request.method == "POST":
-        score = request.POST.get("rating")
-        text = request.POST.get("review")
-        
+        score = request.POST.get("rating", "").strip()
+        text = request.POST.get("review", "").strip()
+
+        user_id = request.session.get("user_id")
+
+        if not user_id:
+            return HttpResponse(
+                "You must log in before writing a review.",
+                status=403,
+            )
+
         if not score:
-            return HttpResponse("Rating is required.")
+            return HttpResponse("Rating is required.", status=400)
 
         try:
             score = int(score)
         except ValueError:
-            return HttpResponse("Rating must be a number.")
+            return HttpResponse(
+                "Rating must be a number.",
+                status=400,
+            )
 
-        if score < 0 or score > 10:
-            return HttpResponse("Rating must be between 0 and 10.")
+        if not 0 <= score <= 10:
+            return HttpResponse(
+                "Rating must be between 0 and 10.",
+                status=400,
+            )
 
         if not text:
-            return HttpResponse("Review cannot be empty.")
+            return HttpResponse(
+                "Review text is required.",
+                status=400,
+            )
 
-        return HttpResponse(
-            f"Movie {movie_id}<br>"
-            f"Rating={score}<br>"
-            f"Review={text}"
+        user = get_object_or_404(User, id=user_id)
+
+        Review.objects.create(
+            user=user,
+            movie=movie,
+            star_rating=score,
+            review_text=text,
         )
 
-    return render(request, "review.html")
+        return redirect("movie_detail", movie_id=movie.id)
+
+    return render(
+        request,
+        "review.html",
+        {"movie": movie},
+    )

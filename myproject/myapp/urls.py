@@ -6,5 +6,22 @@ urlpatterns = [
     path("register/", views.register, name="register"),
     path("login/", views.login, name="login"),
     path("movies/", views.movie_list, name="movie_list"),
-    path("review/<int:movie_id>/", views.review, name="review"),
+
+    path(
+        "movies/search/",
+        views.movie_search,
+        name="movie_search",
+    ),
+
+    path(
+        "movies/<int:movie_id>/",
+        views.movie_detail,
+        name="movie_detail",
+    ),
+
+    path(
+        "review/<int:movie_id>/",
+        views.review,
+        name="review",
+    ),
 ]

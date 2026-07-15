@@ -1,0 +1,23 @@
+
+
+{% if movies %}
+    <ul class="movie-list">
+        {% for movie in movies %}
+            <li>
+                <a href="{% url 'movie_detail' movie.id %}">
+                    {{ movie.title }}
+                </a>
+
+                {% if movie.average_rating %}
+                    <span>
+                        {{ movie.average_rating|floatformat:1 }}/10
+                    </span>
+                {% else %}
+                    <span>No ratings</span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No matching movies were found.</p>
+{% endif %}

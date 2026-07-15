@@ -4,36 +4,48 @@
 
 <h2>Movie List</h2>
 
-<form method="get">
+<form
+    method="get"
+    hx-get="{% url 'movie_search' %}"
+    hx-target="#movie-results"
+    hx-trigger="keyup changed delay:500ms from:#search,
+                change from:#rating"
+    hx-include="#search, #rating"
+>
+    <div>
+        <label for="search">Search by title</label>
+        <input
+            id="search"
+            type="search"
+            name="search"
+            value="{{ search }}"
+            placeholder="Enter a movie title"
+        >
+    </div>
 
-    <label>Search:</label>
-    <input
-        type="text"
-        name="search"
-        value="{{ request.GET.search }}">
+    <div>
+        <label for="rating">Minimum rating</label>
+        <input
+            id="rating"
+            type="number"
+            name="rating"
+            min="0"
+            max="10"
+            value="{{ rating }}"
+        >
+    </div>
 
-    <br><br>
-
-    <label>Minimum Rating:</label>
-    <input
-        type="number"
-        name="rating"
-        min="0"
-        max="10"
-        value="{{ request.GET.rating }}">
-
-    <br><br>
-
-    <input type="submit" value="Search">
-
+    <noscript>
+        <button type="submit">Search</button>
+    </noscript>
 </form>
 
-<hr>
-
-<ul>
-    <li>Inception</li>
-    <li>Interstellar</li>
-    <li>The Dark Knight</li>
-</ul>
+<section
+    id="movie-results"
+    aria-live="polite"
+    aria-label="Movie search results"
+>
+    {% include "partials/movie_results.html" %}
+</section>
 
 {% endblock %}

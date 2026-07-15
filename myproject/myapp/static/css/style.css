@@ -68,3 +68,50 @@ button:hover {
     }
 
 }
+
+.movie-list {
+    list-style: none;
+    padding: 0;
+}
+
+.movie-list li {
+    background: white;
+    margin-bottom: 10px;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.movie-list a {
+    color: #005ea8;
+    font-weight: bold;
+}
+
+#movie-results {
+    margin-top: 20px;
+    min-height: 80px;
+}
+
+.movie-detail {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.movie-poster {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.review-list {
+    list-style: none;
+    padding: 0;
+}
+
+.review-list li {
+    background: white;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+}
