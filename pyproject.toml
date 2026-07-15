@@ -1,5 +1,5 @@
 [project]
-name = "Film Review"
+name = "FilmReview"
 version = "0.1.0"
 description = "Viewing and writing movie reviews"
 readme = "README.md"

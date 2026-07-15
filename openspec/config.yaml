@@ -1,0 +1,26 @@
+schema: spec-driven
+
+context: |
+  Tech stack: Python 3.13, Django 6.x
+  Package manager: uv
+  Formatter: black (line-length 88)
+  Linter: pylint
+  Testing: pytest + pytest-cov
+  Domain: FilmReview - a movie review application where users can view and write reviews for movies.
+
+  Conventions:
+  - Business logic goes in services.py
+  - Read/query logic goes in selectors.py
+  - Keep tasks thin; they should call service functions
+  - Do not edit old migrations; create new ones
+  - Prefer small, targeted changes over broad refactors
+
+rules:
+  proposal:
+    - Keep proposals under 500 words
+    - Always include a "Non-goals" section
+    - Reference existing code patterns when applicable
+  tasks:
+    - Break tasks into chunks of max 2 hours
+    - Each task should be independently testable
+    - Include verification steps

@@ -1,5 +1,6 @@
 # uv / Python virtual environment
 .venv/
+env1/
 
 # Python cache files
 __pycache__/
@@ -12,3 +13,11 @@ __pycache__/
 # Coverage reports
 .coverage
 htmlcov/
+
+# OpenCode
+.opencode/sessions/
+.opencode/cache/
+
+# OS files
+.DS_Store
+Thumbs.db

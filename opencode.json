@@ -1,0 +1,71 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md", "openspec/specs/**/*.md"],
+  "permission": {
+    "edit": "ask",
+    "bash": "ask"
+  },
+  "agent": {
+    "build": {
+      "description": "Default development agent with full tool access for implementing features and fixing bugs",
+      "mode": "primary",
+      "permission": {
+        "edit": "allow",
+        "bash": {
+          "*": "ask",
+          "python manage.py *": "allow",
+          "pytest*": "allow",
+          "uv *": "allow",
+          "git status*": "allow",
+          "git diff*": "allow",
+          "git log*": "allow"
+        }
+      }
+    },
+    "plan": {
+      "description": "Planning and analysis agent - reviews code and creates plans without making changes",
+      "mode": "primary",
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "ask",
+          "python manage.py *": "allow",
+          "pytest*": "allow",
+          "git status*": "allow",
+          "git diff*": "allow"
+        }
+      }
+    },
+    "django-reviewer": {
+      "description": "Reviews Django code for best practices, ORM performance, and security issues",
+      "mode": "subagent",
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "python manage.py *": "allow",
+          "pytest*": "allow",
+          "git diff*": "allow"
+        }
+      },
+      "prompt": "You are a Django expert reviewing code. Focus on:\n- ORM query optimization (N+1 queries, select_related, prefetch_related)\n- Model design and migration safety\n- View/serializer security (permission checks, input validation)\n- API response shape consistency\n- Test coverage gaps\nProvide actionable feedback with specific file references."
+    },
+    "test-writer": {
+      "description": "Writes and maintains pytest tests for Django models, views, and APIs",
+      "mode": "subagent",
+      "permission": {
+        "edit": "allow",
+        "bash": {
+          "pytest*": "allow",
+          "python manage.py *": "allow"
+        }
+      },
+      "prompt": "You are a test engineer for a Django project. Write pytest tests following these conventions:\n- Use pytest fixtures, not unittest classes\n- Test model methods, view responses, and API contracts\n- Cover edge cases and permission scenarios\n- Use factories for test data (if available) or Django's test client\n- Run tests after writing them to verify they pass"
+    }
+  },
+  "autoupdate": true,
+  "snapshot": true,
+  "compaction": {
+    "auto": true,
+    "prune": true
+  }
+}
