@@ -34,12 +34,27 @@
             value="{{ rating }}"
         >
     </div>
-
+    <label for="sort">Sort:</label>
+<select id="sort" name="sort">
+    <option value="title">Title</option>
+    <option value="rating_desc">Highest rating</option>
+    <option value="rating_asc">Lowest rating</option>
+</select>
     <noscript>
         <button type="submit">Search</button>
     </noscript>
 </form>
+{% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+{% endif %}
 
+<span>
+    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+</span>
+
+{% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+{% endif %}
 <section
     id="movie-results"
     aria-live="polite"

@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404,render
 from django.http import HttpResponse
 from django.db.models import Avg
 from .models import User,Movie,Review
+from django.core.paginator import Paginator
 
 def home(request):
     return render(request, "home.html")
@@ -23,12 +24,21 @@ def register(request):
 
         if len(password) > 9:
             return HttpResponse("Password must be 9 characters or less.")
+        
+        if User.objects.filter(username=username).exists():
+            return HttpResponse(
+                "This username is already in use.",
+                status=400,
+            )
+
+        user = User.objects.create(
+            username=username,
+            password=password,
+        )
 
         return HttpResponse(f"Registered: {username}")
     
-        return HttpResponse(
-            f"Registered: {username}"
-        )
+        
 
     return render(request, "register.html")
 
@@ -44,13 +54,20 @@ def login(request):
                 password=password
             )
         except User.DoesNotExist:
-            return HttpResponse("Invalid username or password.")
+            return HttpResponse(
+                "Invalid username or password.",
+                status=400,
+            )
 
         request.session["user_id"] = user.id
 
         return HttpResponse(f"Welcome {user.username}")
 
     return render(request, "login.html")
+
+def logout_view(request):
+    request.session.flush()
+    return redirect("home")
 
 
 
@@ -62,8 +79,21 @@ def movie_list(request):
         average_rating=Avg("reviews__star_rating")
     ).order_by("title")
 
+    sort = request.GET.get("sort", "title")
+
+    if sort == "rating_desc":
+        movies = movies.order_by("-average_rating", "title")
+    elif sort == "rating_asc":
+        movies = movies.order_by("average_rating", "title")
+    else:
+        movies = movies.order_by("title")
+        
     if search:
         movies = movies.filter(title__icontains=search)
+    
+    paginator = Paginator(movies, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
     if rating:
         try:
@@ -75,7 +105,7 @@ def movie_list(request):
                 )
         except ValueError:
             pass
-
+     
     context = {
         "movies": movies,
         "search": search,

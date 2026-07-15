@@ -1,7 +1,7 @@
 schema: spec-driven
 
 context: |
-  Tech stack: Python 3.13, Django 6.x
+  Tech stack: Python 3.13, Django 6.x, htmx 2.0.4
   Package manager: uv
   Formatter: black (line-length 88)
   Linter: pylint
@@ -15,22 +15,24 @@ context: |
 
   Database models:
   - User: username (CharField, max_length=30, unique), password (CharField, max_length=9)
-  - Movie: title (CharField, max_length=200), poster_image (CharField, max_length=255)
-  - Review: user (FK→User, CASCADE), movie (FK→Movie, CASCADE), star_rating (PositiveSmallIntegerField), review_text (TextField)
+  - Movie: title (CharField, max_length=200), poster_image (URLField, max_length=500, blank=True)
+  - Review: user (FK→User, CASCADE, related_name="reviews"), movie (FK→Movie, CASCADE, related_name="reviews"), star_rating (PositiveSmallIntegerField), review_text (TextField)
 
   URL routes:
   - / — home (renders template)
-  - /register/ — user registration (POST: validates, stub)
+  - /register/ — user registration (POST: saves to DB)
   - /login/ — user login (POST: queries DB, sets session)
-  - /movies/ — movie list (renders template, search/rating params)
-  - /review/<id>/ — write review (POST: validates, stub)
+  - /movies/ — movie list (DB query, pagination, HTMX search)
+  - /movies/search/ — movie search partial (returns HTML fragment)
+  - /movies/<id>/ — movie detail (DB query, shows reviews)
+  - /review/<id>/ — write review (POST: saves to DB, requires login)
 
-  Templates:
-  - base.html — base layout with nav (Home, Movies, Register, Login)
-  - home.html, register.html, login.html, movie_list.html, review.html
-
-  Static:
-  - css/style.css — basic styling
+  Features:
+  - HTMX-powered live search on movie list
+  - Pagination (10 movies per page)
+  - Average rating calculation via annotation
+  - Session-based authentication
+  - Admin interface for all models
 
 rules:
   proposal:

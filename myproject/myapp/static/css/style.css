@@ -115,3 +115,14 @@ button:hover {
     margin-bottom: 12px;
     border-radius: 8px;
 }
+
+.movie-poster{
+    width:250px;
+    border-radius:10px;
+    margin-bottom:20px;
+}
+
+.movie-list img{
+    width:120px;
+    border-radius:8px;
+}

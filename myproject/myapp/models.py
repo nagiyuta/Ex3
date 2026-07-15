@@ -11,11 +11,15 @@ class User(models.Model):
 
 class Movie(models.Model):
     title = models.CharField(max_length=200)
-    poster_image = models.CharField(max_length=255)
+
+    poster_image = models.URLField(
+        max_length=500,
+        blank=True,
+        verbose_name="Poster Image URL"
+    )
 
     def __str__(self):
         return self.title
-
 
 class Review(models.Model):
     user = models.ForeignKey(

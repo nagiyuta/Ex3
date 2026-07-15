@@ -38,11 +38,11 @@ Renders the home page template.
 
 **GET**: Renders registration form.
 
-**POST**: Validates input fields.
-- `username` — required, max 30 characters
+**POST**: Validates and saves user.
+- `username` — required, max 30 characters, must be unique
 - `password` — required, max 9 characters
-
-Returns validation errors or success response. Does NOT save to database yet (stub).
+- Creates `User` object on success
+- Returns 400 on validation error or duplicate username
 
 ---
 
@@ -61,7 +61,7 @@ Returns validation errors or success response. Does NOT save to database yet (st
 **POST**: Authenticates user.
 - Queries `User.objects.get(username, password)`
 - Sets `request.session["user_id"]` on success
-- Returns error on `User.DoesNotExist`
+- Returns 400 on `User.DoesNotExist`
 
 ---
 
@@ -75,11 +75,59 @@ Returns validation errors or success response. Does NOT save to database yet (st
 | **Method** | GET |
 | **Template** | `movie_list.html` |
 
-Renders movie list template. Accepts query parameters:
-- `search` — search keyword (not yet implemented)
-- `rating` — minimum rating filter (not yet implemented)
+Renders movie list with search, filter, sort, and pagination.
 
-Movie list is currently hardcoded in template.
+**Query parameters:**
+- `search` — title search (icontains)
+- `rating` — minimum average rating (0-10)
+- `sort` — "title" (default), "rating_desc", "rating_asc"
+- `page` — pagination page number
+
+**Features:**
+- Annotates movies with `average_rating` from reviews
+- Paginates results (10 per page)
+- HTMX-enabled for live search
+
+---
+
+### Movie Search (HTMX Partial)
+
+| Property | Value |
+|----------|-------|
+| **Path** | `/movies/search/` |
+| **View** | `views.movie_search` |
+| **Name** | `movie_search` |
+| **Method** | GET |
+| **Template** | `partials/movie_results.html` |
+
+Returns HTML fragment for HTMX dynamic search.
+
+**Query parameters:**
+- `search` — title search (icontains)
+- `rating` — minimum average rating (0-10)
+
+**Returns:** Partial HTML with movie list items.
+
+---
+
+### Movie Detail
+
+| Property | Value |
+|----------|-------|
+| **Path** | `/movies/<int:movie_id>/` |
+| **View** | `views.movie_detail` |
+| **Name** | `movie_detail` |
+| **Method** | GET |
+| **Template** | `movie_detail.html` |
+| **Parameters** | `movie_id` (int) |
+
+Displays movie details with reviews.
+
+**Context:**
+- `movie` — Movie object with `average_rating` annotation
+- `reviews` — QuerySet of reviews with `select_related("user")`
+
+**Returns 404** if movie not found.
 
 ---
 
@@ -94,23 +142,28 @@ Movie list is currently hardcoded in template.
 | **Template** | `review.html` |
 | **Parameters** | `movie_id` (int) |
 
-**GET**: Renders review form.
+**GET**: Renders review form for the movie.
 
-**POST**: Validates review input.
+**POST**: Validates and saves review.
+- Requires `request.session["user_id"]` (login required)
 - `rating` — required, integer, 0-10
 - `review` — required, non-empty
-
-Returns validation errors or confirmation. Does NOT save to database yet (stub).
+- Creates `Review` object on success
+- Redirects to `movie_detail` on success
+- Returns 400 on validation error
+- Returns 403 if not logged in
 
 ## Current State
 
-| View | Status |
-|------|--------|
-| `home` | Implemented (template render) |
-| `register` | Stub (validation only, no DB save) |
-| `login` | Implemented (DB query + session) |
-| `movie_list` | Stub (hardcoded data) |
-| `review` | Stub (validation only, no DB save) |
+| View | DB Operations | Status |
+|------|--------------|--------|
+| `home` | None | Implemented |
+| `register` | Creates User | Implemented |
+| `login` | Queries User | Implemented |
+| `movie_list` | Queries Movies + Avg | Implemented |
+| `movie_search` | Queries Movies + Avg | Implemented |
+| `movie_detail` | Queries Movie + Reviews | Implemented |
+| `review` | Creates Review | Implemented |
 
 ## Requirements
 
@@ -121,7 +174,7 @@ Returns validation errors or confirmation. Does NOT save to database yet (stub).
 ### User Registration
 
 - The system SHALL display a registration form at `/register/`
-- The system SHALL validate username (required, max 30 chars)
+- The system SHALL validate username (required, max 30 chars, unique)
 - The system SHALL validate password (required, max 9 chars)
 - The system SHALL save new users to the database
 
@@ -134,13 +187,18 @@ Returns validation errors or confirmation. Does NOT save to database yet (stub).
 
 ### Movie Browsing
 
-- The system SHALL list movies at `/movies/`
-- The system SHALL support searching movies by keyword
-- The system SHALL support filtering movies by minimum rating
+- The system SHALL list movies at `/movies/` with average rating
+- The system SHALL support searching movies by title (icontains)
+- The system SHALL support filtering movies by minimum average rating
+- The system SHALL support sorting by title or rating
+- The system SHALL paginate results (10 per page)
+- The system SHALL display movie details at `/movies/<id>/`
 
 ### Review Writing
 
 - The system SHALL display a review form at `/review/<id>/`
+- The system SHALL require login to submit a review
 - The system SHALL validate rating (required, 0-10)
 - The system SHALL validate review text (required, non-empty)
 - The system SHALL save reviews to the database
+- The system SHALL redirect to movie detail after submission

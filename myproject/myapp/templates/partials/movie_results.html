@@ -4,6 +4,14 @@
     <ul class="movie-list">
         {% for movie in movies %}
             <li>
+		{% if movie.poster_image %}
+    			<img
+        			src="{{ movie.poster_image }}"
+        			alt="{{ movie.title }}"
+        		width="120">
+		{% endif %}
+
+<br>
                 <a href="{% url 'movie_detail' movie.id %}">
                     {{ movie.title }}
                 </a>

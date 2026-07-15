@@ -10,6 +10,7 @@ This is a Django app called **FilmReview** for viewing and writing movie reviews
 - Linter: pylint
 - Test framework: pytest + pytest-cov
 - Database: SQLite3
+- Frontend: htmx 2.0.4 (for dynamic search)
 
 ### Project structure
 
@@ -24,12 +25,11 @@ app/
 │   │   └── wsgi.py
 │   └── myapp/              # Main application
 │       ├── models.py       # User, Movie, Review models
-│       ├── views.py        # 5 view functions
-│       ├── urls.py         # 5 URL patterns
-│       ├── templates/      # HTML templates
+│       ├── views.py        # 8 view functions
+│       ├── urls.py         # 7 URL patterns
+│       ├── admin.py        # All models registered
+│       ├── templates/      # HTML templates + partials
 │       ├── static/css/     # Stylesheets
-│       ├── admin.py
-│       ├── apps.py
 │       └── migrations/
 ├── openspec/               # Project specifications
 ├── opencode.json           # OpenCode configuration
@@ -39,18 +39,20 @@ app/
 ### Database models
 
 - **User** — `username` (unique), `password`
-- **Movie** — `title`, `poster_image`
+- **Movie** — `title`, `poster_image` (URLField, optional)
 - **Review** — `user` (FK→User), `movie` (FK→Movie), `star_rating`, `review_text`
 
 ### URL routes
 
 | Path | View | Name | Status |
 |------|------|------|--------|
-| `/` | `home` | `home` | Implemented (template) |
-| `/register/` | `register` | `register` | Implemented (stub) |
-| `/login/` | `login` | `login` | Implemented (DB query) |
-| `/movies/` | `movie_list` | `movie_list` | Implemented (stub) |
-| `/review/<int:movie_id>/` | `review` | `review` | Implemented (stub) |
+| `/` | `home` | `home` | Template render |
+| `/register/` | `register` | `register` | DB save + validation |
+| `/login/` | `login` | `login` | DB query + session |
+| `/movies/` | `movie_list` | `movie_list` | DB query + pagination + HTMX |
+| `/movies/search/` | `movie_search` | `movie_search` | Partial HTML (HTMX) |
+| `/movies/<id>/` | `movie_detail` | `movie_detail` | DB query + reviews |
+| `/review/<id>/` | `review` | `review` | DB save + validation |
 
 ## Important project conventions
 
@@ -69,17 +71,19 @@ app/
 
 - User-Movie-Review foreign key relationships (CASCADE delete)
 - star_rating validation (PositiveSmallIntegerField, 0-32767)
-- Session management in login view
-- Form validation logic in register/review views
+- Session management (user_id in session)
+- HTMX partial responses (movie_search view)
+- Pagination logic in movie_list
 
 ## Change coupling
 
 If you change:
 
 - User model -> also check Review (FK), views, admin
-- Movie model -> also check Review (FK), views, admin
-- Review model -> also check views, admin
-- Views -> also check URL conf and templates
+- Movie model -> also check Review (FK), views, admin, templates
+- Review model -> also check views, admin, templates
+- Views -> also check URL conf, templates, partials
+- Templates -> also check view context variables
 
 ## Constraints
 
@@ -99,5 +103,6 @@ If you change:
 Add or update tests for:
 
 - User registration and login
-- Movie listing
+- Movie listing, search, and detail views
 - Review creation and validation
+- Pagination and filtering

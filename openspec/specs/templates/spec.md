@@ -6,7 +6,7 @@ This specification defines the HTML templates for the FilmReview application.
 
 ## Template Structure
 
-All templates are located in `myproject/myapp/templates/` and use Django's template inheritance system.
+All templates are located in `myproject/myapp/templates/` and use Django's template inheritance system with htmx for dynamic content.
 
 ## Base Template
 
@@ -19,6 +19,7 @@ The base layout template that all other templates extend.
 - Static CSS loading (`css/style.css`)
 - Navigation bar with links to: Home, Movies, Register, Login
 - Content block for child templates
+- htmx 2.0.4 loaded via CDN
 
 **Navigation links:**
 - Home → `/`
@@ -68,20 +69,36 @@ Extends `base.html`. User login form.
 
 ### movie_list.html
 
-Extends `base.html`. Movie list with search/filter form.
+Extends `base.html`. Movie list with HTMX-powered live search.
 
-**Form:**
-- Method: GET
-- Fields:
-  - `search` — text input (search keyword)
-  - `rating` — number input (min 0, max 10)
-- Submit button: "Search"
+**Features:**
+- Search form with HTMX integration:
+  - `hx-get` → `/movies/search/`
+  - `hx-target` → `#movie-results`
+  - `hx-trigger` → keyup with 500ms delay, change on rating
+  - `hx-include` → search and rating inputs
+- Sort dropdown (title, highest rating, lowest rating)
+- Pagination controls (Previous/Next, page X of Y)
+- Results section with `id="movie-results"`
 
-**Movie list:**
-- Currently hardcoded:
-  - Inception
-  - Interstellar
-  - The Dark Knight
+**Form fields:**
+- `search` — text input (search keyword)
+- `rating` — number input (min 0, max 10)
+- `sort` — select dropdown
+
+---
+
+### movie_detail.html
+
+Extends `base.html`. Movie detail page with reviews.
+
+**Content:**
+- Movie title heading
+- Poster image (if available)
+- Average rating display (formatted to 1 decimal)
+- Reviews list with username and rating
+- "Write a review" link
+- "Back to movie list" link
 
 ---
 
@@ -92,16 +109,29 @@ Extends `base.html`. Review writing form.
 **Form:**
 - Method: POST
 - Fields:
-  - `rating` — number input (min 0, max 10)
-  - `review` — textarea (5 rows, 40 cols)
+  - `rating` — number input (min 0, max 10, required)
+  - `review` — textarea (6 rows, required)
 - CSRF token included
-- Submit button: "Submit"
+- Submit button: "Submit Review"
+- "Back to movie details" link
+
+## Partial Templates
+
+### partials/movie_results.html
+
+HTMX partial for dynamic movie search results.
+
+**Features:**
+- Displays movie list with poster images
+- Shows average rating (formatted to 1 decimal) or "No ratings"
+- Links to movie detail page
+- "No matching movies" message when empty
 
 ## Static Files
 
 ### css/style.css
 
-Basic styling for the application.
+Styling for the application.
 
 **Features:**
 - Arial font family
@@ -110,6 +140,10 @@ Basic styling for the application.
 - Blue links (#0066cc) with red hover
 - White form backgrounds with rounded corners
 - Responsive design (max-width: 600px)
+- Movie list styling (white cards, bold links)
+- Movie detail layout (max-width 800px, centered)
+- Review list styling (white cards)
+- Poster images (250px width, rounded corners)
 
 ## Requirements
 
@@ -118,12 +152,19 @@ Basic styling for the application.
 - The system SHALL provide a consistent layout across all pages
 - The system SHALL include navigation links to main sections
 - The system SHALL load static CSS files
+- The system SHALL include htmx 2.0.4
 
 ### Forms
 
 - All forms SHALL include CSRF tokens
 - All forms SHALL use proper input types (text, password, number)
 - All forms SHALL have submit buttons
+
+### HTMX Integration
+
+- Movie list search SHALL use HTMX for live updates
+- Search results SHALL update without page reload
+- Results section SHALL have polite aria-live for accessibility
 
 ### Responsive Design
 
