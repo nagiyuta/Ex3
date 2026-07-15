@@ -23,7 +23,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
-          model: anthropic/claude-sonnet-4-20250514
+          model: anthropic/claude-sonnet-4-5
           prompt: |
             Review this issue for the FilmReview Django project.
             - If it's a bug report, analyze the described behavior and suggest debugging steps
