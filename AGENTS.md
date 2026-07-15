@@ -24,8 +24,10 @@ app/
 │   │   └── wsgi.py
 │   └── myapp/              # Main application
 │       ├── models.py       # User, Movie, Review models
-│       ├── views.py        # View functions (stubs)
-│       ├── urls.py         # URL patterns
+│       ├── views.py        # 5 view functions
+│       ├── urls.py         # 5 URL patterns
+│       ├── templates/      # HTML templates
+│       ├── static/css/     # Stylesheets
 │       ├── admin.py
 │       ├── apps.py
 │       └── migrations/
@@ -42,16 +44,13 @@ app/
 
 ### URL routes
 
-| Path | View | Name |
-|------|------|------|
-| `/` | `home` | `home` |
-| `/register/` | `register` | `register` |
-| `/movies/` | `movie_list` | `movie_list` |
-| `/movies/search/` | `search_movies` | `search_movies` |
-| `/movies/sort/` | `sort_movies` | `sort_movies` |
-| `/movies/filter/` | `filter_movies` | `filter_movies` |
-| `/movies/<int:movie_id>/` | `movie_detail` | `movie_detail` |
-| `/movies/<int:movie_id>/review/` | `write_review` | `write_review` |
+| Path | View | Name | Status |
+|------|------|------|--------|
+| `/` | `home` | `home` | Implemented (template) |
+| `/register/` | `register` | `register` | Implemented (stub) |
+| `/login/` | `login` | `login` | Implemented (DB query) |
+| `/movies/` | `movie_list` | `movie_list` | Implemented (stub) |
+| `/review/<int:movie_id>/` | `review` | `review` | Implemented (stub) |
 
 ## Important project conventions
 
@@ -70,7 +69,8 @@ app/
 
 - User-Movie-Review foreign key relationships (CASCADE delete)
 - star_rating validation (PositiveSmallIntegerField, 0-32767)
-- Query performance for movie reviews with joins
+- Session management in login view
+- Form validation logic in register/review views
 
 ## Change coupling
 
@@ -79,7 +79,7 @@ If you change:
 - User model -> also check Review (FK), views, admin
 - Movie model -> also check Review (FK), views, admin
 - Review model -> also check views, admin
-- Views -> also check URL conf
+- Views -> also check URL conf and templates
 
 ## Constraints
 
@@ -98,7 +98,6 @@ If you change:
 
 Add or update tests for:
 
-- User registration
-- Movie listing and detail views
+- User registration and login
+- Movie listing
 - Review creation and validation
-- Search, sort, and filter functionality

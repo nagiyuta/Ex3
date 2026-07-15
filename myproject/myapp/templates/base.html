@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Film Review</title>
-</head>
 
+{% load static %}
+
+<meta charset="UTF-8">
+
+<title>Film Review</title>
+
+<link rel="stylesheet"
+      href="{% static 'css/style.css' %}">
+
+</head>
 <body>
 
 <h1>Film Review</h1>
 
-<hr>
+<h2>
+<nav>
 
 <a href="/">Home</a>
 
@@ -18,8 +27,8 @@
 
 <a href="/login/">Login</a>
 
-<hr>
-
+</nav>
+</h2>
 {% block content %}
 
 {% endblock %}

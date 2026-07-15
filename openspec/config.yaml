@@ -7,11 +7,11 @@ context: |
   Linter: pylint
   Testing: pytest + pytest-cov
   Database: SQLite3
-  Domain: FilmReview - a movie review application where users can register, browse movies, and write reviews.
+  Domain: FilmReview - a movie review application where users can register, login, browse movies, and write reviews.
 
   Project structure:
   - myproject/myproject/ — Django project config (settings, urls, wsgi)
-  - myproject/myapp/ — Main application with models, views, urls, migrations
+  - myproject/myapp/ — Main application with models, views, urls, templates, static
 
   Database models:
   - User: username (CharField, max_length=30, unique), password (CharField, max_length=9)
@@ -19,14 +19,18 @@ context: |
   - Review: user (FK→User, CASCADE), movie (FK→Movie, CASCADE), star_rating (PositiveSmallIntegerField), review_text (TextField)
 
   URL routes:
-  - / — home
-  - /register/ — user registration
-  - /movies/ — movie list
-  - /movies/search/ — search movies
-  - /movies/sort/ — sort movies by rating
-  - /movies/filter/ — filter movies by rating
-  - /movies/<id>/ — movie detail
-  - /movies/<id>/review/ — write review
+  - / — home (renders template)
+  - /register/ — user registration (POST: validates, stub)
+  - /login/ — user login (POST: queries DB, sets session)
+  - /movies/ — movie list (renders template, search/rating params)
+  - /review/<id>/ — write review (POST: validates, stub)
+
+  Templates:
+  - base.html — base layout with nav (Home, Movies, Register, Login)
+  - home.html, register.html, login.html, movie_list.html, review.html
+
+  Static:
+  - css/style.css — basic styling
 
 rules:
   proposal:

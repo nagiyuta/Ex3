@@ -20,7 +20,11 @@ The project uses two-level URL configuration:
 | **View** | `views.home` |
 | **Name** | `home` |
 | **Method** | GET |
-| **Response** | `HttpResponse("Film Review Home")` |
+| **Template** | `home.html` |
+
+Renders the home page template.
+
+---
 
 ### User Registration
 
@@ -29,8 +33,37 @@ The project uses two-level URL configuration:
 | **Path** | `/register/` |
 | **View** | `views.register` |
 | **Name** | `register` |
-| **Method** | GET |
-| **Response** | `HttpResponse("User Registration Page")` |
+| **Methods** | GET, POST |
+| **Template** | `register.html` |
+
+**GET**: Renders registration form.
+
+**POST**: Validates input fields.
+- `username` — required, max 30 characters
+- `password` — required, max 9 characters
+
+Returns validation errors or success response. Does NOT save to database yet (stub).
+
+---
+
+### User Login
+
+| Property | Value |
+|----------|-------|
+| **Path** | `/login/` |
+| **View** | `views.login` |
+| **Name** | `login` |
+| **Methods** | GET, POST |
+| **Template** | `login.html` |
+
+**GET**: Renders login form.
+
+**POST**: Authenticates user.
+- Queries `User.objects.get(username, password)`
+- Sets `request.session["user_id"]` on success
+- Returns error on `User.DoesNotExist`
+
+---
 
 ### Movie List
 
@@ -40,63 +73,44 @@ The project uses two-level URL configuration:
 | **View** | `views.movie_list` |
 | **Name** | `movie_list` |
 | **Method** | GET |
-| **Response** | `HttpResponse("Movie List")` |
+| **Template** | `movie_list.html` |
 
-### Search Movies
+Renders movie list template. Accepts query parameters:
+- `search` — search keyword (not yet implemented)
+- `rating` — minimum rating filter (not yet implemented)
 
-| Property | Value |
-|----------|-------|
-| **Path** | `/movies/search/` |
-| **View** | `views.search_movies` |
-| **Name** | `search_movies` |
-| **Method** | GET |
-| **Response** | `HttpResponse("Search Movies")` |
+Movie list is currently hardcoded in template.
 
-### Sort Movies
-
-| Property | Value |
-|----------|-------|
-| **Path** | `/movies/sort/` |
-| **View** | `views.sort_movies` |
-| **Name** | `sort_movies` |
-| **Method** | GET |
-| **Response** | `HttpResponse("Sort Movies by Star Rating")` |
-
-### Filter Movies
-
-| Property | Value |
-|----------|-------|
-| **Path** | `/movies/filter/` |
-| **View** | `views.filter_movies` |
-| **Name** | `filter_movies` |
-| **Method** | GET |
-| **Response** | `HttpResponse("Hide Movies Below Selected Rating")` |
-
-### Movie Detail
-
-| Property | Value |
-|----------|-------|
-| **Path** | `/movies/<int:movie_id>/` |
-| **View** | `views.movie_detail` |
-| **Name** | `movie_detail` |
-| **Method** | GET |
-| **Parameters** | `movie_id` (int) |
-| **Response** | `HttpResponse("Movie {movie_id}")` |
+---
 
 ### Write Review
 
 | Property | Value |
 |----------|-------|
-| **Path** | `/movies/<int:movie_id>/review/` |
-| **View** | `views.write_review` |
-| **Name** | `write_review` |
-| **Method** | GET |
+| **Path** | `/review/<int:movie_id>/` |
+| **View** | `views.review` |
+| **Name** | `review` |
+| **Methods** | GET, POST |
+| **Template** | `review.html` |
 | **Parameters** | `movie_id` (int) |
-| **Response** | `HttpResponse("Write Review for Movie {movie_id}")` |
+
+**GET**: Renders review form.
+
+**POST**: Validates review input.
+- `rating` — required, integer, 0-10
+- `review` — required, non-empty
+
+Returns validation errors or confirmation. Does NOT save to database yet (stub).
 
 ## Current State
 
-All views are **stubs** returning plain text responses. No template rendering, form handling, or ORM queries are implemented yet.
+| View | Status |
+|------|--------|
+| `home` | Implemented (template render) |
+| `register` | Stub (validation only, no DB save) |
+| `login` | Implemented (DB query + session) |
+| `movie_list` | Stub (hardcoded data) |
+| `review` | Stub (validation only, no DB save) |
 
 ## Requirements
 
@@ -106,16 +120,27 @@ All views are **stubs** returning plain text responses. No template rendering, f
 
 ### User Registration
 
-- The system SHALL display a registration page at `/register/`
+- The system SHALL display a registration form at `/register/`
+- The system SHALL validate username (required, max 30 chars)
+- The system SHALL validate password (required, max 9 chars)
+- The system SHALL save new users to the database
+
+### User Login
+
+- The system SHALL display a login form at `/login/`
+- The system SHALL authenticate users against the database
+- The system SHALL create a session on successful login
+- The system SHALL display an error for invalid credentials
 
 ### Movie Browsing
 
-- The system SHALL list all movies at `/movies/`
-- The system SHALL display movie details at `/movies/<id>/`
-- The system SHALL support searching movies at `/movies/search/`
-- The system SHALL support sorting movies by rating at `/movies/sort/`
-- The system SHALL support filtering movies by rating at `/movies/filter/`
+- The system SHALL list movies at `/movies/`
+- The system SHALL support searching movies by keyword
+- The system SHALL support filtering movies by minimum rating
 
 ### Review Writing
 
-- The system SHALL allow writing reviews at `/movies/<id>/review/`
+- The system SHALL display a review form at `/review/<id>/`
+- The system SHALL validate rating (required, 0-10)
+- The system SHALL validate review text (required, non-empty)
+- The system SHALL save reviews to the database
