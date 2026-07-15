@@ -6,12 +6,21 @@ context: |
   Formatter: black (line-length 88)
   Linter: pylint
   Testing: pytest + pytest-cov
+  Database: SQLite3
   Domain: FilmReview - a movie review application where users can view and write reviews for movies.
+
+  Project structure:
+  - myproject/myproject/ — Django project config (settings, urls, wsgi)
+  - myproject/myapp/ — Main application with models, views, migrations
+
+  Database models:
+  - Movie: title (CharField), director (CharField), release_year (IntegerField), genre (CharField)
+  - Review: movie (FK→Movie, CASCADE), reviewer (CharField), rating (IntegerField), comment (TextField), created_at (DateTimeField, auto_now_add)
+  - Relationship: Review belongs to Movie (related_name="reviews")
 
   Conventions:
   - Business logic goes in services.py
   - Read/query logic goes in selectors.py
-  - Keep tasks thin; they should call service functions
   - Do not edit old migrations; create new ones
   - Prefer small, targeted changes over broad refactors
 

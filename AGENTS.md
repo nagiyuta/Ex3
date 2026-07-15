@@ -9,34 +9,56 @@ This is a Django app called **FilmReview** for viewing and writing movie reviews
 - Formatter: black (line-length 88)
 - Linter: pylint
 - Test framework: pytest + pytest-cov
+- Database: SQLite3
+
+### Project structure
+
+```
+myproject/
+├── manage.py
+├── db.sqlite3
+├── myproject/          # Project configuration
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+└── myapp/              # Main application
+    ├── models.py       # Movie, Review models
+    ├── views.py
+    ├── admin.py
+    └── migrations/
+```
+
+### Database models
+
+- **Movie** — `title`, `director`, `release_year`, `genre`
+- **Review** — `movie` (FK→Movie), `reviewer`, `rating`, `comment`, `created_at`
 
 ## Important project conventions
 
-- Put business logic in `services.py`, not in views or serializers.
+- Put business logic in `services.py`, not in views.
 - Put reusable read/query logic in `selectors.py`.
-- Keep Celery tasks thin (if Celery is used); they should call service functions.
 - Follow Django best practices for model design and URL routing.
 
 ## Commands
 
-- Run server: `python manage.py runserver`
+- Run server: `cd myproject && python manage.py runserver`
 - Run tests: `pytest`
-- Create migrations: `python manage.py makemigrations`
-- Apply migrations: `python manage.py migrate`
+- Create migrations: `cd myproject && python manage.py makemigrations`
+- Apply migrations: `cd myproject && python manage.py migrate`
 
 ## Things that are easy to break
 
-- API response shapes in API endpoints
-- Model relationships and query performance
-- Form validation logic
+- Movie-Review ForeignKey relationship (CASCADE delete)
+- Review rating validation (IntegerField)
+- Query performance for movie reviews
 
 ## Change coupling
 
 If you change:
 
-- a model -> also check serializers, factories, and admin
-- views -> also check URL conf and templates
-- permissions -> also check both web views and API endpoints
+- Movie model -> also check Review model, admin, and views
+- Review model -> also check Movie related_name="reviews"
+- Views -> also check URL conf
 
 ## Constraints
 
@@ -58,6 +80,6 @@ If you change:
 
 Add or update tests for:
 
-- Model changes
-- API response changes
-- Permission changes
+- Movie CRUD operations
+- Review creation and validation
+- Movie-Review relationship integrity
