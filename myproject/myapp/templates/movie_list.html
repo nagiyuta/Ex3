@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Movie List</h2>
+
+<form method="get">
+
+    <label>Search:</label>
+    <input
+        type="text"
+        name="search"
+        value="{{ request.GET.search }}">
+
+    <br><br>
+
+    <label>Minimum Rating:</label>
+    <input
+        type="number"
+        name="rating"
+        min="0"
+        max="10"
+        value="{{ request.GET.rating }}">
+
+    <br><br>
+
+    <input type="submit" value="Search">
+
+</form>
+
+<hr>
+
+<ul>
+    <li>Inception</li>
+    <li>Interstellar</li>
+    <li>The Dark Knight</li>
+</ul>
+
+{% endblock %}

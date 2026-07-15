@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Write Review</h2>
+
+<form method="post">
+
+{% csrf_token %}
+
+Rating (0-10)
+
+<input
+type="number"
+name="rating"
+min="0"
+max="10">
+
+<br><br>
+
+<textarea
+name="review"
+rows="5"
+cols="40">
+</textarea>
+
+<br><br>
+
+<input type="submit" value="Submit">
+
+</form>
+
+{% endblock %}
