@@ -5,6 +5,16 @@
     "edit": "ask",
     "bash": "ask"
   },
+  "mcp": {
+    "github": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "enabled": true,
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_TOKEN}"
+      }
+    }
+  },
   "agent": {
     "build": {
       "description": "Default development agent with full tool access for implementing features and fixing bugs",
@@ -18,7 +28,9 @@
           "uv *": "allow",
           "git status*": "allow",
           "git diff*": "allow",
-          "git log*": "allow"
+          "git log*": "allow",
+          "git push*": "ask",
+          "git pull*": "allow"
         }
       }
     },
@@ -60,6 +72,18 @@
         }
       },
       "prompt": "You are a test engineer for a Django project. Write pytest tests following these conventions:\n- Use pytest fixtures, not unittest classes\n- Test model methods, view responses, and API contracts\n- Cover edge cases and permission scenarios\n- Use factories for test data (if available) or Django's test client\n- Run tests after writing them to verify they pass"
+    },
+    "github-manager": {
+      "description": "Manages GitHub issues, pull requests, and code reviews",
+      "mode": "subagent",
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "gh *": "allow",
+          "git *": "allow"
+        }
+      },
+      "prompt": "You are a GitHub project manager. Use the github MCP tools to:\n- Read and analyze issues\n- Create and update pull requests\n- Review code changes\n- Manage labels and milestones\n- Triage incoming issues\nAlways provide clear, actionable summaries."
     }
   },
   "autoupdate": true,
