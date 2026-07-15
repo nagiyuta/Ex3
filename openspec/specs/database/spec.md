@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This specification defines the database schema for the FilmReview application, a Django-based system for managing movies and user reviews.
+This specification defines the database schema for the FilmReview application, a Django-based system for user registration, movie browsing, and review writing.
 
 ## Technology
 
@@ -13,6 +13,18 @@ This specification defines the database schema for the FilmReview application, a
 
 ## Models
 
+### User
+
+Stores user accounts for the application.
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| `id` | BigAutoField | PRIMARY KEY, AUTO | Unique identifier |
+| `username` | CharField | max_length=30, unique=True | Login name |
+| `password` | CharField | max_length=9 | Password (plain text) |
+
+**String representation**: `User.username`
+
 ### Movie
 
 Stores information about films.
@@ -21,9 +33,7 @@ Stores information about films.
 |-------|------|-------------|-------------|
 | `id` | BigAutoField | PRIMARY KEY, AUTO | Unique identifier |
 | `title` | CharField | max_length=200 | Movie title |
-| `director` | CharField | max_length=100 | Director name |
-| `release_year` | IntegerField | — | Year of release |
-| `genre` | CharField | max_length=100 | Genre category |
+| `poster_image` | CharField | max_length=255 | Poster image URL or path |
 
 **String representation**: `Movie.title`
 
@@ -34,55 +44,58 @@ Stores user reviews linked to movies.
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|
 | `id` | BigAutoField | PRIMARY KEY, AUTO | Unique identifier |
-| `movie` | ForeignKey | →Movie, ON DELETE CASCADE | Associated movie |
-| `reviewer` | CharField | max_length=100 | Reviewer name |
-| `rating` | IntegerField | — | Rating score |
-| `comment` | TextField | — | Review text |
-| `created_at` | DateTimeField | auto_now_add=True | Creation timestamp |
+| `user` | ForeignKey | →User, ON DELETE CASCADE | Review author |
+| `movie` | ForeignKey | →Movie, ON DELETE CASCADE | Reviewed movie |
+| `star_rating` | PositiveSmallIntegerField | — | Rating (0-32767) |
+| `review_text` | TextField | — | Review content |
 
-**String representation**: `"{movie.title} - {reviewer}"`
-
-**Related name**: `reviews` (access via `movie.reviews.all()`)
+**String representation**: `"{movie.title} - {star_rating}/10"`
 
 ## Relationships
 
 ```
-┌──────────────┐       ┌──────────────┐
-│    Movie     │       │    Review    │
-├──────────────┤       ├──────────────┤
-│ id (PK)      │◄──────│ id (PK)      │
-│ title        │   1:N │ movie (FK)   │
-│ director     │       │ reviewer     │
-│ release_year │       │ rating       │
-│ genre        │       │ comment      │
-└──────────────┘       │ created_at   │
-                       └──────────────┘
+┌──────────────┐       ┌──────────────┐       ┌──────────────┐
+│     User     │       │    Review    │       │    Movie     │
+├──────────────┤       ├──────────────┤       ├──────────────┤
+│ id (PK)      │◄──┐   │ id (PK)      │   ┌──►│ id (PK)      │
+│ username     │   └───│ user (FK)    │   │   │ title        │
+│ password     │       │ movie (FK)───┘   │   │ poster_image │
+└──────────────┘       │ star_rating  │   │   └──────────────┘
+        │              │ review_text  │   │
+        │              └──────────────┘   │
+        │                                 │
+        └───────────── 1:N ──────────────┘
 ```
 
-- **One Movie** has **many Reviews** (1:N relationship)
-- Deleting a Movie **cascades** to delete all its Reviews
-- Reviews are accessible via `movie.reviews.all()`
+- **One User** has **many Reviews** (1:N via `user` FK)
+- **One Movie** has **many Reviews** (1:N via `movie` FK)
+- Deleting a User **cascades** to delete their Reviews
+- Deleting a Movie **cascades** to delete its Reviews
 
 ## Requirements
 
+### User Management
+
+- The system SHALL allow creating users with unique username and password
+- The system SHALL enforce username uniqueness
+- The system SHALL allow retrieving users by ID or username
+
 ### Movie Management
 
-- The system SHALL allow creating movies with title, director, year, and genre
+- The system SHALL allow creating movies with title and poster image
 - The system SHALL allow retrieving all movies
 - The system SHALL allow retrieving a single movie by ID
-- The system SHALL allow updating movie information
-- The system SHALL allow deleting movies (cascades to reviews)
 
 ### Review Management
 
-- The system SHALL allow creating reviews linked to a movie
+- The system SHALL allow creating reviews linked to a user and movie
 - The system SHALL allow retrieving all reviews for a movie
-- The system SHALL allow retrieving a single review by ID
+- The system SHALL allow retrieving all reviews by a user
 - The system SHALL allow deleting reviews
-- The system SHALL automatically set `created_at` on review creation
+- The system SHALL enforce foreign key constraints (CASCADE delete)
 
 ### Data Integrity
 
-- The system SHALL enforce foreign key constraints (CASCADE delete)
+- The system SHALL enforce foreign key constraints between Review→User and Review→Movie
 - The system SHALL use BigAutoField for all primary keys
-- The system SHALL preserve referential integrity between Movie and Review
+- The system SHALL enforce unique usernames
